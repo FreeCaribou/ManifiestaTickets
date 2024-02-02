@@ -29,6 +29,7 @@ export class PageSellingsTicketsComponent implements OnInit {
 
   // Chart
   chartOptions = {};
+  chart2Options = {};
   iLikeChart = false;
   dateTable: { date: string, amount: number, amountSince?: number }[] = []
 
@@ -81,6 +82,20 @@ export class PageSellingsTicketsComponent implements OnInit {
         data: [{
           type: 'stepLine',
           dataPoints: this.dateTable.map((dt, key) => { return { x: new Date(dt.date), y: dt.amountSince } })
+        }]
+      };
+
+
+      // One day transform that to bart with multi level, week by week
+      // https://canvasjs.com/angular-charts/stacked-column-chart/
+      this.chart2Options = {
+        title: {
+          text: "Sales each days"
+        },
+        animationEnabled: true,
+        data: [{
+          type: "column",
+          dataPoints: this.dateTable.map(dt => { return { x: new Date(dt.date), y: dt.amount } })
         }]
       }
 
