@@ -12,7 +12,7 @@ import { ExcelService } from 'src/app/shared/services/communication/excel.servic
 })
 export class PageOrderNotFinishComponent implements OnInit {
 
-  displayedSellersColumns: string[] = ['merchantReference', 'date', 'sellerId', 'name', 'email', 'details', 'actions'];
+  displayedSellersColumns: string[] = ['merchantReference', 'date', 'name', 'email', 'details', 'actions'];
   data: any[] = [];
   sellingInformationsAmountTickets!: number;
 

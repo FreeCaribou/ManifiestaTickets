@@ -18,6 +18,9 @@ export class PageDepartmentsComponent implements OnInit {
   sellingInformationsAmountTickets!: number;
   sortedData: any[] = [];
 
+  chartOptions = {};
+  iLikeChart = false;
+
   constructor(
     private sellersService: SellersService,
     public dialog: MatDialog
@@ -27,9 +30,29 @@ export class PageDepartmentsComponent implements OnInit {
     this.sellersService.getAllDepartmentSellingInformation().subscribe(data => {
       this.sellerDepartmentInformationsAll = data.data;
       this.sellingInformationsAmountTickets = data.totalAmountTicket;
-      this.sortedData = this.sellerDepartmentInformationsAll.slice().sort((a,b) => {
+      this.sortedData = this.sellerDepartmentInformationsAll.slice().sort((a, b) => {
         return a.quantity >= b.quantity ? -1 : 1
       });
+
+      this.chartOptions = {
+        animationEnabled: true,
+        title: {
+          text: "Sales by Department"
+        },
+        data: [{
+          type: "pie",
+          startAngle: -90,
+          indexLabel: "{name}: {y} - {q} sellings",
+          yValueFormatString: "#,###.##'%'",
+          dataPoints: this.sortedData.map(sd => {
+            return {
+              y: sd.quantity / this.sellingInformationsAmountTickets * 100,
+              name: sd.name,
+              q: sd.quantity
+            }
+          })
+        }]
+      }
     });
   }
 
@@ -41,6 +64,10 @@ export class PageDepartmentsComponent implements OnInit {
     const dialogRef = this.dialog.open(DepartmentSellingModal, {
       data: element,
     });
+  }
+
+  iLikeChartChange() {
+    this.iLikeChart = !this.iLikeChart;
   }
 
 }
@@ -55,7 +82,7 @@ export class DepartmentSellingModal {
     @Inject(MAT_DIALOG_DATA) public data: any,
     private excelService: ExcelService,
   ) { }
-  
+
   export() {
     const toExport: any[] = [];
     // so many loop <3

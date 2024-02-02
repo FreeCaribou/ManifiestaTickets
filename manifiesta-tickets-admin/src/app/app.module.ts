@@ -34,6 +34,7 @@ import { ExcelService } from './shared/services/communication/excel.service';
 import { MatSelectModule } from '@angular/material/select';
 import { PageLongTextComponent } from './pages/page-volunteer/page-volunteer.component';
 import { EditorModule, TINYMCE_SCRIPT_SRC } from '@tinymce/tinymce-angular';
+import { CanvasJSAngularChartsModule } from '@canvasjs/angular-charts';
 
 @NgModule({
   declarations: [
@@ -77,6 +78,8 @@ import { EditorModule, TINYMCE_SCRIPT_SRC } from '@tinymce/tinymce-angular';
     MatProgressSpinnerModule,
     MatDialogModule,
     MatSelectModule,
+
+    CanvasJSAngularChartsModule,
   ],
   providers: [
     { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: { appearance: 'fill' } },
