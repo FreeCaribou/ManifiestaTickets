@@ -35,7 +35,6 @@ export class PageDepartmentsComponent implements OnInit {
       });
 
       this.chartOptions = {
-        animationEnabled: true,
         title: {
           text: "Sales by Department"
         },

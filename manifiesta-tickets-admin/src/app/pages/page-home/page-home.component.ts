@@ -15,6 +15,9 @@ export class PageHomeComponent implements OnInit {
   sellerSellingInformationsAll: any[] = [];
   sellingInformationsAmountTickets!: number;
   sortedData: any[] = [];
+  ticketsType: { id: string; label: string; amount: number }[] = [];
+  chartOptions = {};
+  iLikeChart = false;
 
   constructor(private sellersService: SellersService, public dialog: MatDialog) { }
 
@@ -23,6 +26,37 @@ export class PageHomeComponent implements OnInit {
       this.sellerSellingInformationsAll = data.data;
       this.sellingInformationsAmountTickets = data.totalAmountTicket;
       this.sortedData = this.sellerSellingInformationsAll.slice();
+      this.sortedData.forEach(sd => {
+        sd.details.forEach((d: any) => {
+          d?.ticketInfo?.forEach((ti: any) => {
+            const index = this.ticketsType.findIndex(tt => tt.id === ti.ticketId);
+            if (index > -1) {
+              this.ticketsType[index].amount += ti.ticketAmount;
+            } else {
+              this.ticketsType.push({ id: ti.ticketId, label: ti.ticketLabel, amount: ti.ticketAmount });
+            }
+          });
+        });
+      });
+
+      this.chartOptions = {
+        title: {
+          text: "Sales by ticket types"
+        },
+        data: [{
+          type: "pie",
+          startAngle: -90,
+          indexLabel: "{name}: {y} - {q} sellings",
+          yValueFormatString: "#,###.##'%'",
+          dataPoints: this.ticketsType.map(tt => {
+            return {
+              y: tt.amount / this.sellingInformationsAmountTickets * 100,
+              name: tt.label,
+              q: tt.amount
+            }
+          })
+        }]
+      }
     });
   }
 
@@ -36,6 +70,10 @@ export class PageHomeComponent implements OnInit {
     });
   }
 
+  iLikeChartChange() {
+    this.iLikeChart = !this.iLikeChart;
+  }
+
 }
 
 @Component({
@@ -46,5 +84,5 @@ export class SellerSellingModal {
   constructor(
     public dialogRef: MatDialogRef<SellerSellingModal>,
     @Inject(MAT_DIALOG_DATA) public data: any,
-  ) {}
+  ) { }
 }
