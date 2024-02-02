@@ -27,7 +27,9 @@ export class PageDepartmentsComponent implements OnInit {
     this.sellersService.getAllDepartmentSellingInformation().subscribe(data => {
       this.sellerDepartmentInformationsAll = data.data;
       this.sellingInformationsAmountTickets = data.totalAmountTicket;
-      this.sortedData = this.sellerDepartmentInformationsAll.slice();
+      this.sortedData = this.sellerDepartmentInformationsAll.slice().sort((a,b) => {
+        return a.quantity >= b.quantity ? -1 : 1
+      });
     });
   }
 
