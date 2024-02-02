@@ -27,6 +27,11 @@ export class PageSellingsTicketsComponent implements OnInit {
   sellerNameSelected = new FormControl([]);
   sellerNameAsked = '';
 
+  // Chart
+  chartOptions = {};
+  iLikeChart = false;
+  dateTable: { date: string, amount: number, amountSince?: number }[] = []
+
   constructor(
     private sellersService: SellersService,
     public dialog: MatDialog,
@@ -42,6 +47,42 @@ export class PageSellingsTicketsComponent implements OnInit {
       this.zipList = [...new Set(this.sellingInformationsAllBase.map(s => s.zip))].sort();
       this.channelList = [...new Set(this.sellingInformationsAllBase.map(s => s.channel))].sort();
       this.sellerNameList = [...new Set(this.sellingInformationsAllBase.map(s => s.sellerName))].sort();
+
+      this.table.forEach(t => {
+        const date = `${new Date(t.date).getFullYear()}-${new Date(t.date).getUTCMonth() + 1}-${new Date(t.date).getDate()}`;
+        const index = this.dateTable.findIndex(dt => dt.date === date);
+        if (index > -1) {
+          this.dateTable[index].amount++;
+        } else {
+          this.dateTable.push({ date: date, amount: 1 });
+        }
+      })
+
+      this.dateTable = this.dateTable.sort((a, b) => {
+        return a > b ? 1 : -1;
+      });
+
+      this.dateTable.forEach((dt, index) => {
+        if (index === 0) {
+          this.dateTable[0].amountSince = this.dateTable[0].amount;
+        } else {
+          this.dateTable[index].amountSince = this.dateTable[index].amount + (this.dateTable[index - 1]?.amountSince as number);
+        }
+      });
+
+      // TODO find a balance how to show the date
+      // Each date is useless, to much x
+      // Each date with a selling can be no representatif (if we have 5 days without selling for e.g.)
+      // Need to try each week maybe
+
+      this.chartOptions = {
+        title: { text: 'Sales through time' },
+        axisY: { title: 'Total selling' },
+        data: [{
+          type: 'stepLine',
+          dataPoints: this.dateTable.map((dt, key) => { return { x: new Date(dt.date), y: dt.amountSince } })
+        }]
+      }
 
       // usefull to get all email adress
       // const listOfMail: any[] = [...new Set(data.map((d: any) => d.sellerId.toLowerCase()))];
@@ -69,11 +110,10 @@ export class PageSellingsTicketsComponent implements OnInit {
   }
 
   filtering() {
-    console.log('eeee')
     this.table = this.sellingInformationsAllBase;
 
     if (this.isWorkingGroup) {
-      this.table = this.sellingInformationsAllBase.filter(x => {return x.workGroup });
+      this.table = this.sellingInformationsAllBase.filter(x => { return x.workGroup });
     }
 
     if (this.zipSelected?.value && this.zipSelected?.value?.length > 0) {
@@ -100,6 +140,10 @@ export class PageSellingsTicketsComponent implements OnInit {
   changeWorkingGroup() {
     this.isWorkingGroup = !this.isWorkingGroup;
     this.filtering();
+  }
+
+  iLikeChartChange() {
+    this.iLikeChart = !this.iLikeChart;
   }
 
 }
