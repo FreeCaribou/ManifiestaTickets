@@ -10,6 +10,10 @@ export class SellersService {
 
   constructor(private http: HttpClient) { }
 
+  getAllPossibleDepartments(): Observable<any> {
+    return this.http.get<any[]>(`${environment.apiUrl}departments/nl`);
+  }
+
   getAll(): Observable<any[]> {
     return this.http.get<any[]>(`${environment.apiUrl}sellers/2024`);
   }

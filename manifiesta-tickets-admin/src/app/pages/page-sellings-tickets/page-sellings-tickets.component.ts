@@ -173,7 +173,7 @@ export class PageSellingsTicketsComponent implements OnInit {
 
   edit(element: any) {
     const dialogRef = this.dialog.open(EditSellingInfoModal, {
-      data: {...element},
+      data: { ...element },
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -189,15 +189,25 @@ export class PageSellingsTicketsComponent implements OnInit {
   selector: 'app-edit-selling-info-modal',
   templateUrl: 'edit-selling-info-modal.html',
 })
-export class EditSellingInfoModal {
+export class EditSellingInfoModal implements OnInit {
+  departments = [];
+
   constructor(
     public dialogRef: MatDialogRef<EditSellingInfoModal>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private sellersService: SellersService,
   ) { }
 
+  ngOnInit(): void {
+    this.sellersService.getAllPossibleDepartments().subscribe(departments => {
+      this.departments = departments;
+    })
+  }
+
   save() {
-    this.sellersService.editSellingInformation(this.data.id, {sellerPostalCode: this.data.zip, fromWorkGroup: this.data.workGroup}).subscribe(data => {
+    this.sellersService.editSellingInformation(this.data.id, {
+      sellerPostalCode: this.data.zip, fromWorkGroup: this.data.workGroup, sellerDepartmentId: this.data.department
+    }).subscribe(data => {
       this.dialogRef.close('edit');
     });
   }
