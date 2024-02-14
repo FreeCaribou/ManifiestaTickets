@@ -5,6 +5,12 @@
         <mat-label>Zip</mat-label>
         <input matInput [(ngModel)]="data.zip">
     </mat-form-field>
+    <br>
+    <mat-label>Work group ?</mat-label>
+    <mat-slide-toggle [(ngModel)]="data.workGroup">
+        {{data.workGroup}}
+    </mat-slide-toggle>
+    <!-- <mat-checkbox [(ngModel)]="data.workGroup">Work group ?</mat-checkbox> -->
 </div>
 <div mat-dialog-actions>
     <button mat-button color="primary" cdkFocusInitial (click)="save()">Save change</button>

@@ -173,7 +173,7 @@ export class PageSellingsTicketsComponent implements OnInit {
 
   edit(element: any) {
     const dialogRef = this.dialog.open(EditSellingInfoModal, {
-      data: element,
+      data: {...element},
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -197,7 +197,7 @@ export class EditSellingInfoModal {
   ) { }
 
   save() {
-    this.sellersService.editSellingInformation(this.data.id, {sellerPostalCode: this.data.zip}).subscribe(data => {
+    this.sellersService.editSellingInformation(this.data.id, {sellerPostalCode: this.data.zip, fromWorkGroup: this.data.workGroup}).subscribe(data => {
       this.dialogRef.close('edit');
     });
   }
