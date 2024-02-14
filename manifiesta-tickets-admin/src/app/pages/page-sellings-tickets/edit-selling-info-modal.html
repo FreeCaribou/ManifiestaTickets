@@ -1,0 +1,11 @@
+<h1 mat-dialog-title>Edit information</h1>
+
+<div mat-dialog-content>
+    <mat-form-field appearance="fill">
+        <mat-label>Zip</mat-label>
+        <input matInput [(ngModel)]="data.zip">
+    </mat-form-field>
+</div>
+<div mat-dialog-actions>
+    <button mat-button color="primary" cdkFocusInitial (click)="save()">Save change</button>
+</div>

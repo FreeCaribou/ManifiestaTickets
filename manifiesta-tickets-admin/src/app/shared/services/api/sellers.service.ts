@@ -86,4 +86,12 @@ export class SellersService {
     );
   }
 
+  editSellingInformation(id: number, body: any): Observable<any> {
+    return this.http.put<any>(
+      `${environment.apiUrl}admins/sellingsInformations/${id}`,
+      body,
+      { headers: { token: localStorage.getItem('admin-token') as string } }
+    );
+  }
+
 }
