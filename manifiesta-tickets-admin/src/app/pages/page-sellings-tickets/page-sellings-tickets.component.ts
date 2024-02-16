@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { SellersService } from 'src/app/shared/services/api/sellers.service';
 import { ExcelService } from 'src/app/shared/services/communication/excel.service';
+import { LoaderService } from 'src/app/shared/services/communication/loader.service';
 
 @Component({
   selector: 'app-page-sellings-tickets',
@@ -11,7 +12,7 @@ import { ExcelService } from 'src/app/shared/services/communication/excel.servic
 })
 export class PageSellingsTicketsComponent implements OnInit {
 
-  displayedDepartmentColumns: string[] = ['type', 'clientName', 'channel', 'zip', 'date', 'price', 'sellerName', 'workGroup', 'merchRef'];
+  displayedDepartmentColumns: string[] = ['action', 'type', 'clientName', 'channel', 'zip', 'date', 'price', 'sellerName', 'workGroup', 'merchRef'];
   sellingInformationsAllBase: any[] = [];
   sellingInformationsAmountTickets!: number;
 
@@ -37,9 +38,15 @@ export class PageSellingsTicketsComponent implements OnInit {
     private sellersService: SellersService,
     public dialog: MatDialog,
     private excelService: ExcelService,
+    private loaderService: LoaderService,
   ) { }
 
   ngOnInit(): void {
+    this.initTable();
+  }
+
+  initTable() {
+    this.loaderService.startLoading(PageSellingsTicketsComponent.name);
     this.sellersService.getAllFinishSellingsInformationTickets().subscribe(data => {
       this.sellingInformationsAllBase = data;
       this.sellingInformationsAmountTickets = this.sellingInformationsAllBase.length;
@@ -117,6 +124,9 @@ export class PageSellingsTicketsComponent implements OnInit {
       //   listOfMail.slice(999, 1099).join(','),
       //   listOfMail.slice(1099, 1199).join(','),
       // )
+    }).add(() => {
+      this.loaderService.stopLoading(PageSellingsTicketsComponent.name);
+      this.filtering();
     });
   }
 
@@ -159,6 +169,47 @@ export class PageSellingsTicketsComponent implements OnInit {
 
   iLikeChartChange() {
     this.iLikeChart = !this.iLikeChart;
+  }
+
+  edit(element: any) {
+    const dialogRef = this.dialog.open(EditSellingInfoModal, {
+      data: { ...element },
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result == 'edit') {
+        this.initTable();
+      }
+    });
+  }
+
+}
+
+@Component({
+  selector: 'app-edit-selling-info-modal',
+  templateUrl: 'edit-selling-info-modal.html',
+})
+export class EditSellingInfoModal implements OnInit {
+  departments = [];
+
+  constructor(
+    public dialogRef: MatDialogRef<EditSellingInfoModal>,
+    @Inject(MAT_DIALOG_DATA) public data: any,
+    private sellersService: SellersService,
+  ) { }
+
+  ngOnInit(): void {
+    this.sellersService.getAllPossibleDepartments().subscribe(departments => {
+      this.departments = departments;
+    })
+  }
+
+  save() {
+    this.sellersService.editSellingInformation(this.data.id, {
+      sellerPostalCode: this.data.zip, fromWorkGroup: this.data.workGroup, sellerDepartmentId: this.data.department
+    }).subscribe(data => {
+      this.dialogRef.close('edit');
+    });
   }
 
 }

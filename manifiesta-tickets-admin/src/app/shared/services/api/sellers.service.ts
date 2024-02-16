@@ -10,6 +10,10 @@ export class SellersService {
 
   constructor(private http: HttpClient) { }
 
+  getAllPossibleDepartments(): Observable<any> {
+    return this.http.get<any[]>(`${environment.apiUrl}departments/nl`);
+  }
+
   getAll(): Observable<any[]> {
     return this.http.get<any[]>(`${environment.apiUrl}sellers/2024`);
   }
@@ -80,6 +84,14 @@ export class SellersService {
   beepleFunctions(): Observable<any> {
     return this.http.get<any>(
       `${environment.apiUrl}admins/beeple/functions`,
+      { headers: { token: localStorage.getItem('admin-token') as string } }
+    );
+  }
+
+  editSellingInformation(id: number, body: any): Observable<any> {
+    return this.http.put<any>(
+      `${environment.apiUrl}admins/sellingsInformations/${id}`,
+      body,
       { headers: { token: localStorage.getItem('admin-token') as string } }
     );
   }

@@ -29,7 +29,7 @@ import { FinishOrderModal, PageOrderNotFinishComponent } from './pages/page-orde
 import { DetailsTicketsComponent } from './shared/components/details-tickets/details-tickets.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { TicketsTypesCountComponent } from './shared/components/tickets-types-count/tickets-types-count.component';
-import { PageSellingsTicketsComponent } from './pages/page-sellings-tickets/page-sellings-tickets.component';
+import { EditSellingInfoModal, PageSellingsTicketsComponent } from './pages/page-sellings-tickets/page-sellings-tickets.component';
 import { ExcelService } from './shared/services/communication/excel.service';
 import { MatSelectModule } from '@angular/material/select';
 import { PageLongTextComponent } from './pages/page-volunteer/page-volunteer.component';
@@ -53,6 +53,7 @@ import { CanvasJSAngularChartsModule } from '@canvasjs/angular-charts';
     DepartmentSellingModal,
     TicketsTypesCountComponent,
     PageSellingsTicketsComponent,
+    EditSellingInfoModal,
   ],
   imports: [
     BrowserModule,

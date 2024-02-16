@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Sort } from '@angular/material/sort';
 import { User } from 'src/app/shared/models/user.interface';
 import { SellersService } from 'src/app/shared/services/api/sellers.service';
+import { LoaderService } from 'src/app/shared/services/communication/loader.service';
 import { LoginService } from 'src/app/shared/services/communication/login.service';
 import { sortData } from 'src/app/shared/utils/sort-data.utils';
 
@@ -20,6 +21,7 @@ export class PageLoginComponent {
     private sellersService: SellersService,
     private formBuilder: FormBuilder,
     private loginService: LoginService,
+    private loaderService: LoaderService,
   ) {
     this.loginForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
@@ -35,6 +37,7 @@ export class PageLoginComponent {
 
   login() {
     this.errorMessage = null as unknown as string;
+    this.loaderService.startLoading(PageLoginComponent.name);
     this.loginService.login(this.loginForm.value.email, this.loginForm.value.password).subscribe(admin => {
       this.loginService.setUser(admin);
     }, err => {
@@ -47,7 +50,7 @@ export class PageLoginComponent {
       } else {
         this.errorMessage = 'Bad login !';
       }
-    });
+    }).add(() => {this.loaderService.stopLoading(PageLoginComponent.name)});
   }
 
   logout() {

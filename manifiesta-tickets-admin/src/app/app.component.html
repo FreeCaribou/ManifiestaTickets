@@ -7,6 +7,10 @@
   </div>
 </mat-toolbar> -->
 
+<div class="loader" *ngIf="loaderService.loading$ | async">
+  <mat-spinner class="inner-loader"></mat-spinner>
+</div>
+
 <app-menu></app-menu>
 
 <!-- <router-outlet></router-outlet> -->
