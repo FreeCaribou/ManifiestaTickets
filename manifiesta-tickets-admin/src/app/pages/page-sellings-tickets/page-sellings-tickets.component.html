@@ -4,9 +4,9 @@
 <button mat-raised-button color="primary" (click)="export()">Export</button>
 <br>
 
-<mat-slide-toggle [checked]="iLikeChart" (toggleChange)="iLikeChartChange()">
+<!-- <mat-slide-toggle [checked]="iLikeChart" (toggleChange)="iLikeChartChange()">
   I like graphs and charts
-</mat-slide-toggle>
+</mat-slide-toggle> -->
 
 <div *ngIf="iLikeChart">
   <canvasjs-chart [options]="chartOptions" [styles]="{width: '100%', height:'360px'}"></canvasjs-chart>

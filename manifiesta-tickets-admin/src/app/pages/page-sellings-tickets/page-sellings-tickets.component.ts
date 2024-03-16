@@ -4,6 +4,7 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dial
 import { SellersService } from 'src/app/shared/services/api/sellers.service';
 import { ExcelService } from 'src/app/shared/services/communication/excel.service';
 import { LoaderService } from 'src/app/shared/services/communication/loader.service';
+import { LoginService } from 'src/app/shared/services/communication/login.service';
 
 @Component({
   selector: 'app-page-sellings-tickets',
@@ -32,13 +33,16 @@ export class PageSellingsTicketsComponent implements OnInit {
   chartOptions = {};
   chart2Options = {};
   iLikeChart = false;
-  dateTable: { date: string, amount: number, amountSince?: number }[] = []
+  dateTable: { date: string, amount: number, amountSince?: number }[] = [];
+
+  canEdit = false;
 
   constructor(
     private sellersService: SellersService,
     public dialog: MatDialog,
     private excelService: ExcelService,
     private loaderService: LoaderService,
+    private loginService: LoginService,
   ) { }
 
   ngOnInit(): void {
@@ -48,6 +52,11 @@ export class PageSellingsTicketsComponent implements OnInit {
   initTable() {
     this.loaderService.startLoading(PageSellingsTicketsComponent.name);
     this.sellersService.getAllFinishSellingsInformationTickets().subscribe(data => {
+      this.canEdit = this.loginService.getRoles().includes('ADMIN');
+      if (!this.canEdit) {
+        // We remove the action column if we can edit
+        this.displayedDepartmentColumns.shift();
+      }
       this.sellingInformationsAllBase = data;
       this.sellingInformationsAmountTickets = this.sellingInformationsAllBase.length;
       this.table = this.sellingInformationsAllBase;

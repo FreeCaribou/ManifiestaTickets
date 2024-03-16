@@ -23,7 +23,7 @@ export class LoginService {
   }
 
   getRoles() {
-    return localStorage.getItem('roles')?.split(',');
+    return localStorage.getItem('roles')?.split(',') || [];
   }
 
   getUser(): User {
