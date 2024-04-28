@@ -63,6 +63,7 @@ export class SellersService {
   finishOrder(body: any): Observable<any> {
     return this.http.get<any>(
       `${environment.apiUrl}admins/finishOrderPending/${body.vwTransactionId}`,
+      { headers: { token: localStorage.getItem('admin-token') as string } }
     );
   }
 
