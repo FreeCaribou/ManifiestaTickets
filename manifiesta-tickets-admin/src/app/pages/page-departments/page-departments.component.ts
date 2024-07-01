@@ -93,11 +93,11 @@ export class DepartmentSellingModal {
             channel: d.name,
             zip: d.sellerPostalCode,
             price: t.ticketPrice,
-            clientName: d.clientName,
+            clientName: `${d.clientName} ${d.clientLastName}`,
             sellerId: d.sellerId,
             // do they really need the name here ?
             sellerName: d.sellerId,
-            date: d.date,
+            date: d.finishDate,
             workGroup: d.fromWorkGroup,
             eventsquareReference: d.eventsquareReference,
           })
