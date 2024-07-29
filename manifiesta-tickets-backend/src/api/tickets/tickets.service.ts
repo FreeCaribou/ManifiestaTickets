@@ -550,8 +550,6 @@ export class TicketsService {
    * TODO try in full asynchrone
    */
   async finishOrderWithVivaWalletTransactionId(vivaWalletTransactionId: string) {
-    const accessToken = await this.getVivaWaletAccessToken();
-
     const findAlreadyUseVwTransactionId = await this.sellingInformationRepository.findOne({
       where: { vwTransactionId: vivaWalletTransactionId },
     });
@@ -565,6 +563,8 @@ export class TicketsService {
         HttpStatus.CONFLICT,
       );
     }
+
+    const accessToken = await this.getVivaWaletAccessToken();
 
     const transactionVerification = await firstValueFrom(
       this.httpService
@@ -595,6 +595,20 @@ export class TicketsService {
       where: { clientTransactionId: transactionVerification.merchantTrns },
     });
 
+    if (pendingTicket.vwTransactionId) {
+      throw new HttpException(
+        {
+          message: ['error transaction already existing'],
+          code: 'transaction-already-done',
+        },
+        HttpStatus.CONFLICT,
+      );
+    } else {
+      // Here we "reserve" already the place of the transaction to try to avoid duplicate
+      pendingTicket.vwTransactionId = vivaWalletTransactionId;
+      await this.sellingInformationRepository.save(pendingTicket);
+    }
+
     // And command the EventSquare tickets
     const cartid = (
       await firstValueFrom(
@@ -612,7 +626,9 @@ export class TicketsService {
             map((d) => {
               return d.data;
             }),
-            catchError((e) => {
+            catchError(async (e) => {
+              pendingTicket.vwTransactionId = null;
+              await this.sellingInformationRepository.save(pendingTicket);
               return e;
             }),
           ),
@@ -633,19 +649,18 @@ export class TicketsService {
 
     await firstValueFrom(forkJoin(putTicketsInCart));
 
-    const FormData = require('form-data');
-    const bodyFormData = new FormData();
-    bodyFormData.append('redirecturl', 'https://www.manifiesta.be');
-    // TODO have firstname and lastname
-    bodyFormData.append('customer[firstname]', pendingTicket.clientName);
-    bodyFormData.append('customer[lastname]', pendingTicket.clientLastName);
-    bodyFormData.append('customer[email]', pendingTicket.clientEmail);
-    bodyFormData.append('customer[agent]', 'ManifiestApp');
-    bodyFormData.append('customer[language]', 'nl');
-    bodyFormData.append('customer[ip]', '127.0.0.1');
-    bodyFormData.append('invoice', 0);
-    bodyFormData.append('customer[data][sellerId]', pendingTicket.sellerId);
-    bodyFormData.append('testmode', 0);
+    // const FormData = require('form-data');
+    // const bodyFormData = new FormData();
+    // bodyFormData.append('redirecturl', 'https://www.manifiesta.be');
+    // bodyFormData.append('customer[firstname]', pendingTicket.clientName);
+    // bodyFormData.append('customer[lastname]', pendingTicket.clientLastName);
+    // bodyFormData.append('customer[email]', pendingTicket.clientEmail);
+    // bodyFormData.append('customer[agent]', 'ManifiestApp');
+    // bodyFormData.append('customer[language]', 'nl');
+    // bodyFormData.append('customer[ip]', '127.0.0.1');
+    // bodyFormData.append('invoice', 0);
+    // bodyFormData.append('customer[data][sellerId]', pendingTicket.sellerId);
+    // bodyFormData.append('testmode', 0);
 
     console.log('the seller', pendingTicket.sellerId, pendingTicket.sellerDepartmentId)
 
@@ -690,8 +705,10 @@ export class TicketsService {
             map((d) => {
               return d.data;
             }),
-            catchError(err => {
+            catchError(async (err) => {
               console.warn('err for creating event square ticket', err.response.data)
+              pendingTicket.vwTransactionId = null;
+              this.sellingInformationRepository.save(pendingTicket);
               return null;
             })
           ),
